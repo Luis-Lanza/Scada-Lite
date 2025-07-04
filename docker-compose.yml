@@ -1,8 +1,7 @@
 version: '3.8'
 services:
   backend:
-    build:
-      context: ./backend
+    image: luislanza19/scada-backend:latest
     container_name: scada-backend
     ports:
       - "8000:8000"
@@ -13,8 +12,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
+    image: luislanza19/scada-frontend:latest
     container_name: scada-frontend
     ports:
       - "5173:80"
