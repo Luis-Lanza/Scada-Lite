@@ -1,0 +1,38 @@
+# === Python (backend) ===
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+venv/
+.venv/
+
+# === Node.js (frontend) ===
+node_modules/
+dist/
+.env
+
+# === Docker ===
+*.pid
+
+# === Logs ===
+*.log
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Editor/IDE ===
+.vscode/
+.idea/
+*.swp
+
+# === Build Artifacts ===
+*.egg-info/
+
+# === Database (persistencia) ===
+backend/app/db/*.db
+!backend/app/db/.gitkeep
+
+# === Misc ===
+frontend/.env.local
