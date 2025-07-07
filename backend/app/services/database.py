@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, create_engine, Session
+from app.models.user import User  # Importa el modelo de usuario
 
 DATABASE_URL = "sqlite:///./sensores.db"
 engine = create_engine(DATABASE_URL, echo=True)
