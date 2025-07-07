@@ -5,7 +5,7 @@ TEST_USER = {
     "password": "testpass"
 }
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def auth_headers(client):
     # Registra el usuario de test (ignora error si ya existe)
     client.post("/api/auth/register", json=TEST_USER)
