@@ -4,7 +4,12 @@ from app.models.sensor import SensorData
 from app.services.database import get_session
 from typing import List
 
-router = APIRouter()
+from app.routes.auth import get_current_user
+from app.models.user import User
+
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.get("/", response_model=List[SensorData])
 def get_all_sensores(session: Session = Depends(get_session)):
