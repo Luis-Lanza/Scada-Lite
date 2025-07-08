@@ -39,8 +39,9 @@ jobs:
         run: docker push luislanza19/scada-backend:latest
 
   frontend-build:
-    name: Frontend - Build
+    name: Frontend - Test & Build
     runs-on: ubuntu-latest
+    needs: backend-test
     defaults:
       run:
         working-directory: ./frontend
@@ -51,8 +52,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm install
+      - name: Ejecutar tests de frontend
+        run: npm test
       - name: Build frontend
         run: npm run build
       - name: Build Docker image (frontend)
@@ -64,3 +67,36 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push Docker image (frontend)
         run: docker push luislanza19/scada-frontend:latest
+
+  integration-test:
+    name: Integración - Smoke Test
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Docker Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Pull images
+        run: |
+          docker pull luislanza19/scada-backend:latest
+          docker pull luislanza19/scada-frontend:latest
+      - name: Actualizar docker-compose.yml para usar imágenes latest
+        run: |
+          sed -i 's|image: luislanza19/scada-backend.*|image: luislanza19/scada-backend:latest|' docker-compose.yml
+          sed -i 's|image: luislanza19/scada-frontend.*|image: luislanza19/scada-frontend:latest|' docker-compose.yml
+      - name: Levantar servicios (docker-compose up)
+        run: docker-compose up -d
+      - name: Esperar a que los servicios estén listos
+        run: sleep 20
+      - name: Smoke test backend
+        run: curl --fail http://localhost:8000/docs
+      - name: Smoke test frontend
+        run: curl --fail http://localhost:5173 || curl --fail http://localhost:3000
+      - name: Parar servicios
+        run: docker-compose down
